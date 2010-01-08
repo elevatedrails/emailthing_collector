@@ -11,6 +11,11 @@ module Emailthing
     )
     
   end
+  
+  def self.api_key=(val)
+    ActionMailer::Base.emailthing_settings = {:api_key=>val}
+  end
+  
   class ApiKeyMissing < Exception; end
   
 end  

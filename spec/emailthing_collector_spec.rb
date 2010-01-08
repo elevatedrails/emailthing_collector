@@ -33,5 +33,12 @@ describe Emailthing do
       Net::HTTP.should_receive(:post_form).with(URI.parse("http://emailthing.net/projects/my_api_key/sent_emails"),an_instance_of(Hash))
       @mailer_instance.perform_delivery_emailthing(TMail::Mail.new)      
     end
+    
+    it "should allow you to configure the environment by calling the Emailthing.api_key= method" do
+      ActionMailer::Base.emailthing_settings = {:api_key=>nil}
+      Emailthing.api_key = "mike test"
+      ActionMailer::Base.emailthing_settings.should == {:api_key=>"mike test"}
+      
+    end
   end
 end
