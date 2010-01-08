@@ -1,6 +1,6 @@
 # Include hook code here
 
-require File.dirname(__FILE__) +  "lib/emailthing"
+require File.dirname(__FILE__) +  "/lib/emailthing"
 require "net/http"
 require "action_mailer"
 
