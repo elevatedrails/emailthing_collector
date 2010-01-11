@@ -1,5 +1,4 @@
 require "spec_helper"
-
 describe Emailthing do
   describe "Setup" do
   
@@ -39,6 +38,67 @@ describe Emailthing do
       Emailthing.api_key = "mike test"
       ActionMailer::Base.emailthing_settings.should == {:api_key=>"mike test"}
       
+    end
+  end
+
+  class TestMailer < ActionMailer::Base
+    def test_email_no_message_type
+      recipients "mike@example.com"
+      subject "This is a test"
+      from "no-reply@example.com" 
+    end
+    
+    def test_email_custom_message_type
+      recipients "mike@example.com"
+      subject "This is a test"
+      from "no-reply@example.com" 
+      emailthing_message_type "custom"
+    end
+    
+    #kill template handling
+    def render(*args)
+      ""
+    end
+    
+    # give access to the tmail handling
+    # hiding behind a private new is really painful
+    def self.instance=(val)
+      @instance = val
+    end
+    
+    def self.instance
+      @instance
+    end
+    
+    def message
+      @message
+    end
+    
+    def perform_delivery_emailthing(message)
+      self.class.instance = self
+      @message = message
+      super
+    end
+  end
+  
+  describe "Mailer" do
+    
+    before(:each) do
+      Net::HTTP.stub!(:post_form)
+      ActionMailer::Base.delivery_method = :emailthing
+      Emailthing.api_key = "miketest"
+    end
+    
+    it "should set the custom header correctly" do
+      TestMailer.deliver_test_email_custom_message_type
+      tmail = TestMailer.instance.message
+      tmail.header["x-emailthing-message-type"].to_s.should == "custom"
+    end
+    
+    it "should default to the mailer name and templte" do
+      TestMailer.deliver_test_email_no_message_type
+      tmail = TestMailer.instance.message
+      tmail.header["x-emailthing-message-type"].to_s.should == "test_mailer#test_email_no_message_type"      
     end
   end
 end
