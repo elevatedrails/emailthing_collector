@@ -9,7 +9,7 @@ module Emailthing
       raise ApiKeyMissing.new("You must provide an api key. See http://emailthing.net/help/api_key_missing for more information") 
     end
     set_message_type(message)
-    Net::HTTP.post_form(URI.parse("http://emailthing.net/projects/#{api_key}/sent_emails"),
+    Net::HTTP.post_form(URI.parse("http://catcher.emailthing.net/catcher/projects/#{api_key}/emails"),
         :email  => message.encoded
     )
     
